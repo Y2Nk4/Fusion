@@ -1,12 +1,14 @@
 let net = require('net'),
     EventEmitter = require('events').EventEmitter,
-    assert = require('assert')
+    assert = require('assert'),
+    SocketHandler = require('./socket')
 
 
 class ProxyServer extends EventEmitter{
     constructor (options) {
         super();
         this.options = options || {}
+        this.clientSockets = []
 
         console.log(this.options)
 
@@ -20,17 +22,31 @@ class ProxyServer extends EventEmitter{
         this.localServerHost = this.options.localServerHost || '0.0.0.0'
     }
 
-    listen (port, host) {
-        this.localServerPort = port || this.localServerPort
-        this.localServerHost = host || this.localServerHost
+    listen (port, host, cb) {
+        if(typeof port === 'function'){
+            cb = port
+        } else {
+            this.localServerPort = port || this.localServerPort
+            this.localServerHost = host || this.localServerHost
+        }
 
-        this.localServer = net.createServer((socket) => {
-            console.log('someone connects')
+        this.remoteSocket = new net.Socket()
 
-            this.localServerSocket = socket
+        this.remoteSocket.on('error', (error) => {
+            console.log('remote socket error:', error)
         })
 
-        this.localServer.listen(this.localServerPort)
+        this.remoteSocket.connect(this.mainServerPort, this.mainServerHost, () => {
+            this.localServer = net.createServer((socket) => {
+                console.log('== someone connects')
+
+                this.clientSockets.push(new SocketHandler(socket, this.options, this.remoteSocket))
+            })
+
+            this.localServer.listen(this.localServerPort)
+
+            if (cb) cb()
+        })
     }
 }
 

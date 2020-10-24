@@ -3,4 +3,6 @@ let Server = require('./server'),
 
 let proxyServer = new Server(config)
 
-proxyServer.listen()
+proxyServer.listen(() => {
+    console.log('listening local port')
+})

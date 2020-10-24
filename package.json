@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "assert": "^2.0.0"
+    "assert": "^2.0.0",
+    "minecraft-data": "^2.69.1"
   }
 }

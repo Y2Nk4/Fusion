@@ -53,3 +53,22 @@ to do is to change the servers' IP address.
 - First of all, this project now can re-route tcp packets from the 
 edge, which can be work in the game using TCP, such as MineCraft. It
 proves that technically feasible.
+
+- Second, it shows the spending of processing the data packet by Node.JS 
+is reasonable. In the test that the project runs locally, the process 
+for the data only increases few milliseconds.
+
+![compare_1](./docs_resources/ping_compare_1.png)
+![compare_2](./docs_resources/ping_compare_2.png)
+
+
+## 0x03 What else we can do with it?
+
+- By parsing the MineCraft HandShake protocol, we can know the domain
+that the client is requesting for. For example:
+![HandShake Data](./docs_resources/decode_minecraft_handshake_protocol.png)
+
+I am trying to join the server with the domain "localhost" and port 25565,
+we can know both of them by parsing the HandShake protocol. So based on it,
+we can re-route the traffic to the correct server (like the "host" setting
+in the CDN).

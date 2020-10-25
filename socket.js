@@ -4,7 +4,9 @@
  * */
 let EventEmitter = require('events').EventEmitter,
     net = require('net'),
-    udpProto = require('./lib/udpProto/udpProto')
+    udpProto = require('./lib/udpProto/udpProto'),
+    varint = require('varint'),
+    versionCodeMap = require('./data/minecraft-versions')
 
 class SocketHandler extends EventEmitter {
     constructor (socket, options, remoteSocket) {
@@ -27,8 +29,9 @@ class SocketHandler extends EventEmitter {
             })
         }
 
+        let readFirstHandShake = false
+
         // debug
-        let i = 0
 
         this.originSocket.on('error', (error) => {
             console.log('error', error)
@@ -49,19 +52,28 @@ class SocketHandler extends EventEmitter {
         })*/
 
         this.socket.on('data', (clientData) => {
-            if (i <= 5) {
-                console.log(clientData, clientData.toString())
-                i++
+            if (!readFirstHandShake) {
+                readFirstHandShake = true
+                // decode handshake
+
+                try {
+                    let versionCode = varint.decode(clientData.slice(2, 4)),
+                        version = versionCodeMap[versionCode] || 'unknown',
+                        domainLength = clientData.readUIntLE(4, 1),
+                        domain = clientData.slice(5, 5 + domainLength).toString(),
+                        port = clientData.readUInt16BE(5 + domainLength),
+                        state = varint.decode(clientData.slice(7 + domainLength, 7 + domainLength + 2)),
+                        stateName = state === 1 ? 'FetchStatus' : 'Login'
+
+                    console.log('handShake Data:', { versionCode, domain, port, state, stateName })
+                } catch (e) {
+                    console.log('failed to parse data')
+                }
             }
 
             this.originSocket.write(clientData)
         })
         this.originSocket.on('data', (serverData) => {
-            if (i <= 5) {
-                console.log('origin return', this.live, serverData.toString())
-                i++
-            }
-
             if (this.live){
                 this.socket.write(serverData)
             }

@@ -27,6 +27,9 @@ class SocketHandler extends EventEmitter {
             })
         }
 
+        // debug
+        let i = 0
+
         this.originSocket.on('error', (error) => {
             console.log('error', error)
         })
@@ -46,12 +49,19 @@ class SocketHandler extends EventEmitter {
         })*/
 
         this.socket.on('data', (clientData) => {
-            console.log(clientData)
+            if (i <= 5) {
+                console.log(clientData, clientData.toString())
+                i++
+            }
 
             this.originSocket.write(clientData)
         })
         this.originSocket.on('data', (serverData) => {
-            console.log('origin return', this.live, serverData)
+            if (i <= 5) {
+                console.log('origin return', this.live, serverData.toString())
+                i++
+            }
+
             if (this.live){
                 this.socket.write(serverData)
             }

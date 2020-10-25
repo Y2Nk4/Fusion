@@ -21,6 +21,10 @@ class SocketHandler extends EventEmitter {
         } else {
             // Using TCP
             this.originSocket = new net.Socket();
+
+            this.originSocket.connect(options.mainServerPort, options.mainServerHost, () => {
+                console.log('connected to main server')
+            })
         }
 
         this.originSocket.on('error', (error) => {
@@ -40,10 +44,6 @@ class SocketHandler extends EventEmitter {
         this.socket.on('data', (clientData) => {
             console.log('receiving data:', clientData)
         })*/
-
-        this.originSocket.connect(options.mainServerPort, options.mainServerHost, () => {
-            console.log('connected to main server')
-        })
 
         this.socket.on('data', (clientData) => {
             console.log(clientData)

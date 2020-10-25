@@ -1,7 +1,8 @@
 let net = require('net'),
     EventEmitter = require('events').EventEmitter,
     assert = require('assert'),
-    SocketHandler = require('./socket')
+    SocketHandler = require('./socket'),
+    udpProto = require('./lib/udpProto/udpProto')
 
 
 class ProxyServer extends EventEmitter{
@@ -30,22 +31,28 @@ class ProxyServer extends EventEmitter{
             this.localServerHost = host || this.localServerHost
         }
 
-        this.remoteSocket = new net.Socket()
+        if (this.options.receiveUDP) {
+            this.localServer = udpProto.createServer(port);
 
-        this.remoteSocket.on('error', (error) => {
-            console.log('remote socket error:', error)
-        })
-
-        this.remoteSocket.connect(this.mainServerPort, this.mainServerHost, () => {
-            this.localServer = net.createServer((socket) => {
-                console.log('== someone connects')
-
-                this.clientSockets.push(new SocketHandler(socket, this.options, this.remoteSocket))
+            this.localServer.on('listening', () => {
+                if (cb) cb()
             })
 
-            this.localServer.listen(this.localServerPort)
+            this.localServer.on('connect', (socket) => {
+                console.log('== someone connects')
+                this.clientSockets.push(new SocketHandler(socket, this.options))
+            })
+        } else {
+            this.localServer = net.createServer((socket) => {
+                console.log('== someone connects')
+                this.clientSockets.push(new SocketHandler(socket, this.options))
+            })
 
-            if (cb) cb()
+            this.localServer.listen(this.localServerPort, cb)
+        }
+
+        this.localServer.on('error', (error) => {
+            console.log('server error:', error)
         })
     }
 }

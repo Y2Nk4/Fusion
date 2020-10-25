@@ -1,4 +1,7 @@
-let mcData = require("minecraft-data")("1.16.3")
+let udpProto = require('../lib/udpProto/udpProto')
 
-console.log(mcData.protocol)
-console.log(mcData.version)
+let socket = udpProto.connect(2020, 'localhost')
+
+setTimeout(() => {
+    socket.write(Buffer.from('test'))
+}, 100)

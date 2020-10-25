@@ -32,7 +32,7 @@ class ProxyServer extends EventEmitter{
         }
 
         if (this.options.receiveUDP) {
-            this.localServer = udpProto.createServer(port);
+            this.localServer = udpProto.createServer(this.localServerPort);
 
             this.localServer.on('listening', () => {
                 if (cb) cb()

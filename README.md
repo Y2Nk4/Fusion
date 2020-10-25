@@ -72,3 +72,24 @@ I am trying to join the server with the domain "localhost" and port 25565,
 we can know both of them by parsing the HandShake protocol. So based on it,
 we can re-route the traffic to the correct server (like the "host" setting
 in the CDN).
+
+## 0x04 How to deploy?
+
+1. Set up the Node.JS environment
+2. Clone this project by
+    ```shell script
+    git clone https://github.com/Y2Nk4/Fusion.git
+    ```
+3. Go to the project directory, then install the dependencies by the following command
+    ```shell script
+    npm install
+    ```
+4. Go to the `config` directory, copy the `config.js.example` and rename it as `config.js`, then revise the settings.
+    - `mainServerHost` is the host(or IP address or Domain) of your server
+    - `mainServerPort` is the port of your server
+    
+    - `localServerHost` is the host that you want this project to listen,
+    leave it `0.0.0.0` if you want it to work in both LAN and WAN
+    - `localServerPort` is the port that you want this project to listen
+5. Use command `node app.js` to run it
+6. To run it in daemon, using `pm2` to do so, for example, `pm2 start app.js`

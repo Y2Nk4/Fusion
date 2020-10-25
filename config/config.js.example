@@ -1,0 +1,13 @@
+module.exports = {
+    // The host and port that the main game server is.
+    mainServerHost: '27.124.42.245',
+    mainServerPort: 25566,
+
+    // The Host and port you want to use
+    localServerHost: '0.0.0.0',
+    localServerPort: 25565,
+
+    // UDP is not supported yet
+    receiveUDP: false,
+    sendUDP: false
+}
